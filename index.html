@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML 與電腦基礎知識測驗</title>
+<style>
+body {
+  font-family: Arial, "Microsoft JhengHei", sans-serif;
+  background: #f0f4f8;
+  color: #243247;
+  margin: 0;
+  padding: 24px 12px;
+}
+.container {
+  max-width: 760px;
+  margin: auto;
+  background: white;
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px #00000010;
+}
+h1 { color: #2457a7; }
+.question {
+  padding: 16px;
+  margin: 18px 0;
+  border: 1px solid #dce4ee;
+  border-radius: 12px;
+}
+.question p { font-weight: bold; }
+label {
+  display: block;
+  padding: 8px;
+  cursor: pointer;
+}
+button {
+  background: #2457a7;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 8px 8px 8px 0;
+}
+button:hover { background: #173d7a; }
+#result {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #eef5ff;
+}
+.correct { color: #168044; }
+.wrong { color: #c0392b; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>HTML 與電腦基礎知識測驗</h1>
+  <p>共 10 題，每題 10 分，請選出正確答案。</p>
+  <p id="progress">作答進度：0 / 10</p>
+  <form id="quiz"></form>
+  <button type="button" onclick="submitQuiz()">提交答案</button>
+  <button type="button" onclick="resetQuiz()">重新測驗</button>
+  <div id="result" hidden></div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "HTML 的主要用途是什麼？",
+    options: ["製作網頁結構", "編輯影片", "管理硬體", "製作作業系統"],
+    answer: 0
+  },
+  {
+    q: "哪一個標籤通常用來建立最大的標題？",
+    options: ["<p>", "<h1>", "<img>", "<br>"],
+    answer: 1
+  },
+  {
+    q: "CSS 的主要用途是什麼？",
+    options: ["儲存資料", "控制網頁外觀", "播放音樂", "管理檔案"],
+    answer: 1
+  },
+  {
+    q: "JavaScript 常用來做什麼？",
+    options: ["讓網頁具有互動功能", "取代所有硬體", "清潔電腦", "製作網路線"],
+    answer: 0
+  },
+  {
+    q: "下列哪一個是常見的網頁瀏覽器？",
+    options: ["Microsoft Word", "Google Chrome", "Microsoft Excel", "記事本"],
+    answer: 1
+  },
+  {
+    q: "HTML 中，哪個標籤用來建立超連結？",
+    options: ["<a>", "<table>", "<title>", "<body>"],
+    answer: 0
+  },
+  {
+    q: "哪一個標籤用來顯示圖片？",
+    options: ["<h2>", "<img>", "<form>", "<ul>"],
+    answer: 1
+  },
+  {
+    q: "GitHub 主要提供什麼服務？",
+    options: ["程式碼版本管理與協作", "線上購物", "影片剪輯", "硬體維修"],
+    answer: 0
+  },
+  {
+    q: "下列哪一個是 JavaScript 的檔案副檔名？",
+    options: [".jpg", ".mp3", ".js", ".png"],
+    answer: 2
+  },
+  {
+    q: "GitHub Pages 可以用來做什麼？",
+    options: ["發布靜態網站", "升級電腦記憶體", "修理螢幕", "安裝實體網路線"],
+    answer: 0
+  }
+];
+
+const quiz = document.getElementById("quiz");
+
+questions.forEach((item, i) => {
+  const section = document.createElement("div");
+  section.className = "question";
+  section.id = "question" + i;
+
+  const title = document.createElement("p");
+  title.textContent = (i + 1) + ". " + item.q;
+  section.appendChild(title);
+
+  item.options.forEach((option, j) => {
+    const label = document.createElement("label");
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = "q" + i;
+    input.value = j;
+    input.addEventListener("change", updateProgress);
+    label.appendChild(input);
+    label.appendChild(document.createTextNode(" " + option));
+    section.appendChild(label);
+  });
+
+  quiz.appendChild(section);
+});
+
+function updateProgress() {
+  let count = 0;
+  questions.forEach((q, i) => {
+    if (document.querySelector('input[name="q' + i + '"]:checked')) count++;
+  });
+  document.getElementById("progress").textContent =
+    "作答進度：" + count + " / " + questions.length;
+}
+
+function submitQuiz() {
+  let score = 0;
+  let answered = 0;
+  const result = document.getElementById("result");
+  result.hidden = false;
+
+  let html = "";
+  questions.forEach((q, i) => {
+    const selected = document.querySelector('input[name="q' + i + '"]:checked');
+    const section = document.getElementById("question" + i);
+
+    section.classList.remove("correct", "wrong");
+
+    if (selected) {
+      answered++;
+      if (Number(selected.value) === q.answer) {
+        score += 10;
+        section.classList.add("correct");
+      } else {
+        section.classList.add("wrong");
+      }
+    } else {
+      section.classList.add("wrong");
+    }
+
+    html += "<p>" + (i + 1) + ". " +
+      (selected && Number(selected.value) === q.answer ? "答對" : "答錯或未作答") +
+      "；正確答案：" + q.options[q.answer] + "</p>";
+  });
+
+  result.innerHTML =
+    "<h2>測驗結果</h2>" +
+    "<p>得分：" + score + " / 100</p>" +
+    "<p>答對：" + score / 10 + " 題</p>" +
+    "<p>答錯或未作答：" + (10 - score / 10) + " 題</p>" +
+    "<p>已作答：" + answered + " / 10 題</p>" +
+    "<hr>" + html;
+
+  result.scrollIntoView({ behavior: "smooth" });
+}
+
+function resetQuiz() {
+  quiz.reset();
+  document.getElementById("result").hidden = true;
+  document.getElementById("result").innerHTML = "";
+  document.querySelectorAll(".question").forEach(section => {
+    section.classList.remove("correct", "wrong");
+  });
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+</script>
+</body>
+</html>
